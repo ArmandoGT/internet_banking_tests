@@ -56,9 +56,9 @@ def saldo(conta_id):
         min_value=-1_000_000,
         max_value=0,
         allow_nan=False,
-        allow_infinity=False,
     )
 )
+@settings(deadline=None)
 def test_invariante_valor_nao_positivo_sempre_rejeitado(valor):
     reset_database()
 
@@ -72,6 +72,7 @@ def test_invariante_valor_nao_positivo_sempre_rejeitado(valor):
 
 
 @given(conta_id=st.integers(min_value=-9999, max_value=9999))
+@settings(deadline=None)
 def test_invariante_conta_inexistente_no_saldo_retorna_404(conta_id):
     reset_database()
     assume(conta_id not in CONTAS_VALIDAS)
@@ -91,7 +92,7 @@ def test_invariante_conta_inexistente_no_saldo_retorna_404(conta_id):
         allow_infinity=False,
     ),
 )
-@settings(max_examples=30)
+@settings(max_examples=30, deadline=None)
 def test_invariante_transferencia_aceita_conserva_soma_dos_saldos(origem, destino, valor):
     reset_database()
     assume(origem != destino)

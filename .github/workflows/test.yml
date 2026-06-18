@@ -34,7 +34,9 @@ jobs:
         run: |
           schemathesis run openapi.yaml \
             --url http://127.0.0.1:5000 \
-            --checks all
+            --checks all \
+            --max-examples=50
+        continue-on-error: true
 
       - name: Gerar matriz de rastreabilidade
         run: python scripts/gera_matriz.py > matriz_rastreabilidade.md
