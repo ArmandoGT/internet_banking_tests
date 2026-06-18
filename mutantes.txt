@@ -1,0 +1,393 @@
+﻿--- app.py
++++ app.py
+@@ -23,7 +23,7 @@
+ import sqlite3
+ from datetime import datetime
+ 
+-app = Flask(__name__)
++app = None
+ 
+ # ----------------------------------------------------------------------
+ # Carregamento da configuraÃ§Ã£o externa.
+
+--- app.py
++++ app.py
+@@ -35,7 +35,7 @@
+ # para a TestConfig (ex.: app.config.from_object('config.TestConfig')),
+ # isolando o ambiente de mutation testing sem editar este arquivo.
+ # ----------------------------------------------------------------------
+-app.config.from_object('config.Config')
++app.config.from_object('XXconfig.ConfigXX')
+ 
+ 
+ # BANCO DE DADOS
+
+--- app.py
++++ app.py
+@@ -48,7 +48,7 @@
+ 
+ def init_db():
+     # Cria as tabelas e insere os dados iniciais se ainda nÃ£o existirem.
+-    conn = get_db()
++    conn = None
+     conn.executescript("""
+         CREATE TABLE IF NOT EXISTS contas (
+             id      INTEGER PRIMARY KEY,
+
+--- app.py
++++ app.py
+@@ -75,7 +75,7 @@
+ 
+ 
+ # ENDPOINT: GET /saldo/<conta_id>
+-@app.route("/saldo/<int:conta_id>", methods=["GET"])
++@app.route("XX/saldo/<int:conta_id>XX", methods=["GET"])
+ def saldo(conta_id):
+     """
+     Retorna o saldo atual de uma conta.
+
+--- app.py
++++ app.py
+@@ -90,7 +90,7 @@
+     conn.close()
+ 
+     if conta is None:
+-        return jsonify({"erro": "Conta nao encontrada"}), 404
++        return jsonify({"erro": "XXConta nao encontradaXX"}), 404
+ 
+     return jsonify({
+         "conta_id": conta_id,
+
+--- app.py
++++ app.py
+@@ -100,7 +100,7 @@
+ 
+ 
+ # ENDPOINT: POST /transferencia
+-@app.route("/transferencia", methods=["POST"])
++@app.route("XX/transferenciaXX", methods=["POST"])
+ def transferencia():
+     """
+     Realiza uma transferÃªncia entre duas contas.
+
+--- app.py
++++ app.py
+@@ -121,7 +121,7 @@
+ 
+     # Valida presenÃ§a e formato do corpo
+     if dados is None:
+-        return jsonify({"erro": "Corpo da requisicao invalido ou ausente"}), 400
++        return jsonify({"XXerroXX": "Corpo da requisicao invalido ou ausente"}), 400
+ 
+     origem  = dados.get("origem")
+     destino = dados.get("destino")
+
+--- app.py
++++ app.py
+@@ -121,7 +121,7 @@
+ 
+     # Valida presenÃ§a e formato do corpo
+     if dados is None:
+-        return jsonify({"erro": "Corpo da requisicao invalido ou ausente"}), 400
++        return jsonify({"erro": "XXCorpo da requisicao invalido ou ausenteXX"}), 400
+ 
+     origem  = dados.get("origem")
+     destino = dados.get("destino")
+
+--- app.py
++++ app.py
+@@ -128,7 +128,7 @@
+     valor   = dados.get("valor")
+ 
+     # Valida campos obrigatÃ³rios
+-    if origem is None or destino is None or valor is None:
++    if origem is None and destino is None or valor is None:
+         return jsonify({"erro": "Campos obrigatorios ausentes: origem, destino, valor"}), 400
+ 
+     # Valida valor positivo
+
+--- app.py
++++ app.py
+@@ -129,7 +129,7 @@
+ 
+     # Valida campos obrigatÃ³rios
+     if origem is None or destino is None or valor is None:
+-        return jsonify({"erro": "Campos obrigatorios ausentes: origem, destino, valor"}), 400
++        return jsonify({"erro": "XXCampos obrigatorios ausentes: origem, destino, valorXX"}), 400
+ 
+     # Valida valor positivo
+     if not isinstance(valor, (int, float)) or valor <= 0:
+
+--- app.py
++++ app.py
+@@ -132,7 +132,7 @@
+         return jsonify({"erro": "Campos obrigatorios ausentes: origem, destino, valor"}), 400
+ 
+     # Valida valor positivo
+-    if not isinstance(valor, (int, float)) or valor <= 0:
++    if not isinstance(valor, (int, float)) or valor <= 1:
+         return jsonify({"erro": "Valor deve ser positivo"}), 422
+ 
+     # Valida contas distintas
+
+--- app.py
++++ app.py
+@@ -137,7 +137,7 @@
+ 
+     # Valida contas distintas
+     if origem == destino:
+-        return jsonify({"erro": "Origem e destino nao podem ser iguais"}), 422
++        return jsonify({"erro": "XXOrigem e destino nao podem ser iguaisXX"}), 422
+ 
+     conn = get_db()
+     try:
+
+--- app.py
++++ app.py
+@@ -150,7 +150,7 @@
+ 
+         # Valida existÃªncia das contas
+         if conta_origem is None or conta_destino is None:
+-            return jsonify({"erro": "Conta nao encontrada"}), 404
++            return jsonify({"XXerroXX": "Conta nao encontrada"}), 404
+ 
+         # Valida saldo suficiente
+         if conta_origem["saldo"] < valor:
+
+--- app.py
++++ app.py
+@@ -150,7 +150,7 @@
+ 
+         # Valida existÃªncia das contas
+         if conta_origem is None or conta_destino is None:
+-            return jsonify({"erro": "Conta nao encontrada"}), 404
++            return jsonify({"erro": "XXConta nao encontradaXX"}), 404
+ 
+         # Valida saldo suficiente
+         if conta_origem["saldo"] < valor:
+
+--- app.py
++++ app.py
+@@ -155,7 +155,7 @@
+         # Valida saldo suficiente
+         if conta_origem["saldo"] < valor:
+             return jsonify({
+-                "erro":        "Saldo insuficiente",
++                "erro":        "XXSaldo insuficienteXX",
+                 "saldo_atual": conta_origem["saldo"]
+             }), 422
+ 
+
+--- app.py
++++ app.py
+@@ -180,7 +180,7 @@
+ 
+     except Exception as e:
+         conn.rollback()
+-        return jsonify({"erro": "Erro interno", "detalhe": str(e)}), 500
++        return jsonify({"XXerroXX": "Erro interno", "detalhe": str(e)}), 500
+ 
+     finally:
+         conn.close()
+
+--- app.py
++++ app.py
+@@ -180,7 +180,7 @@
+ 
+     except Exception as e:
+         conn.rollback()
+-        return jsonify({"erro": "Erro interno", "detalhe": str(e)}), 500
++        return jsonify({"erro": "XXErro internoXX", "detalhe": str(e)}), 500
+ 
+     finally:
+         conn.close()
+
+--- app.py
++++ app.py
+@@ -180,7 +180,7 @@
+ 
+     except Exception as e:
+         conn.rollback()
+-        return jsonify({"erro": "Erro interno", "detalhe": str(e)}), 500
++        return jsonify({"erro": "Erro interno", "XXdetalheXX": str(e)}), 500
+ 
+     finally:
+         conn.close()
+
+--- app.py
++++ app.py
+@@ -180,7 +180,7 @@
+ 
+     except Exception as e:
+         conn.rollback()
+-        return jsonify({"erro": "Erro interno", "detalhe": str(e)}), 500
++        return jsonify({"erro": "Erro interno", "detalhe": str(e)}), 501
+ 
+     finally:
+         conn.close()
+
+--- app.py
++++ app.py
+@@ -187,7 +187,7 @@
+ 
+ 
+ # ENDPOINT: GET /extrato/<conta_id>
+-@app.route("/extrato/<int:conta_id>", methods=["GET"])
++@app.route("XX/extrato/<int:conta_id>XX", methods=["GET"])
+ def extrato(conta_id):
+     """
+     Retorna o histÃ³rico de transferÃªncias de uma conta.
+
+--- app.py
++++ app.py
+@@ -205,7 +205,7 @@
+ 
+     if conta is None:
+         conn.close()
+-        return jsonify({"erro": "Conta nao encontrada"}), 404
++        return jsonify({"erro": "XXConta nao encontradaXX"}), 404
+ 
+     historico = conn.execute(
+         "SELECT * FROM transferencias "
+
+--- app.py
++++ app.py
+@@ -217,7 +217,7 @@
+ 
+     return jsonify({
+         "conta_id":   conta_id,
+-        "titular":    conta["titular"],
++        "XXtitularXX":    conta["titular"],
+         "saldo_atual": conta["saldo"],
+         "historico":  [dict(r) for r in historico]
+     }), 200
+
+--- app.py
++++ app.py
+@@ -223,7 +223,7 @@
+     }), 200
+ 
+ 
+-if __name__ == "__main__":
++if __name__ == "XX__main__XX":
+     init_db()
+     print("\nSistema de Internet Banking iniciado.")
+     print("Contas disponÃ­veis: 1 (Alice / R$ 1000,00), 2 (Bob / R$ 500,00), 3 (Carlos / R$ 0,00)")
+
+--- app.py
++++ app.py
+@@ -225,7 +225,7 @@
+ 
+ if __name__ == "__main__":
+     init_db()
+-    print("\nSistema de Internet Banking iniciado.")
++    print("XX\nSistema de Internet Banking iniciado.XX")
+     print("Contas disponÃ­veis: 1 (Alice / R$ 1000,00), 2 (Bob / R$ 500,00), 3 (Carlos / R$ 0,00)")
+     print(f"Banco de dados (de config.py): {app.config['DATABASE']}")
+     print("Acesse: http://127.0.0.1:5000\n")
+
+.\venv\Scripts\mutmut : Traceback (most recent call last):
+No linha:1 caractere:182
++ ... Host "=== MUTANTE $_ ==="; .\venv\Scripts\mutmut show $_ 2>&1; Write- ...
++                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Traceback (most recent call last)::String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  File "C:\Users\arman\AppData\Local\Programs\Python\Python38\lib\runpy.py", line 192, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "C:\Users\arman\AppData\Local\Programs\Python\Python38\lib\runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "C:\Users\arman\Desktop\Teste de Software\internet_banking_tests\venv\Scripts\mutmut.exe\__main__.py", line 7, 
+in <module>
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\click\core.py", line 
+1161, in __call__
+    return self.main(*args, **kwargs)
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\click\core.py", line 
+1082, in main
+    rv = self.invoke(ctx)
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\click\core.py", line 
+1697, in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\click\core.py", line 
+1443, in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\click\core.py", line 
+788, in invoke
+    return __callback(*args, **kwargs)
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\mutmut\__init__.py", 
+line 893, in wrapper
+    f(*args, **kwargs)
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\mutmut\__main__.py", 
+line 236, in show
+    print(get_unified_diff(id_or_file, dict_synonyms))
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\mutmut\cache.py", line 
+198, in get_unified_diff
+    filename, mutation_id = filename_and_mutation_id_from_pk(argument)
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\mutmut\cache.py", line 
+88, in wrapper
+    return f(*args, **kwargs)
+  File "<string>", line 2, in filename_and_mutation_id_from_pk
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\pony\orm\core.py", line 
+519, in new_func
+    result = func(*args, **kwargs)
+  File "c:\users\arman\desktop\teste de software\internet_banking_tests\venv\lib\site-packages\mutmut\cache.py", line 
+506, in filename_and_mutation_id_from_pk
+    raise ValueError("Obtained null mutant for pk: {}".format(pk))
+ValueError: Obtained null mutant for pk: 110
+--- app.py
++++ app.py
+@@ -227,7 +227,7 @@
+     init_db()
+     print("\nSistema de Internet Banking iniciado.")
+     print("Contas disponÃ­veis: 1 (Alice / R$ 1000,00), 2 (Bob / R$ 500,00), 3 (Carlos / R$ 0,00)")
+-    print(f"Banco de dados (de config.py): {app.config['DATABASE']}")
++    print(f"Banco de dados (de config.py): {app.config['XXDATABASEXX']}")
+     print("Acesse: http://127.0.0.1:5000\n")
+     app.run(debug=True, port=5000)
+ 
+
+--- app.py
++++ app.py
+@@ -227,7 +227,7 @@
+     init_db()
+     print("\nSistema de Internet Banking iniciado.")
+     print("Contas disponÃ­veis: 1 (Alice / R$ 1000,00), 2 (Bob / R$ 500,00), 3 (Carlos / R$ 0,00)")
+-    print(f"Banco de dados (de config.py): {app.config['DATABASE']}")
++    print(f"XXBanco de dados (de config.py): {app.config['DATABASE']}XX")
+     print("Acesse: http://127.0.0.1:5000\n")
+     app.run(debug=True, port=5000)
+ 
+
+--- app.py
++++ app.py
+@@ -228,6 +228,6 @@
+     print("\nSistema de Internet Banking iniciado.")
+     print("Contas disponÃ­veis: 1 (Alice / R$ 1000,00), 2 (Bob / R$ 500,00), 3 (Carlos / R$ 0,00)")
+     print(f"Banco de dados (de config.py): {app.config['DATABASE']}")
+-    print("Acesse: http://127.0.0.1:5000\n")
++    print("XXAcesse: http://127.0.0.1:5000\nXX")
+     app.run(debug=True, port=5000)
+ 
+
+--- app.py
++++ app.py
+@@ -229,5 +229,5 @@
+     print("Contas disponÃ­veis: 1 (Alice / R$ 1000,00), 2 (Bob / R$ 500,00), 3 (Carlos / R$ 0,00)")
+     print(f"Banco de dados (de config.py): {app.config['DATABASE']}")
+     print("Acesse: http://127.0.0.1:5000\n")
+-    app.run(debug=True, port=5000)
+-
++    app.run(debug=False, port=5000)
++
+
+--- app.py
++++ app.py
+@@ -229,5 +229,5 @@
+     print("Contas disponÃ­veis: 1 (Alice / R$ 1000,00), 2 (Bob / R$ 500,00), 3 (Carlos / R$ 0,00)")
+     print(f"Banco de dados (de config.py): {app.config['DATABASE']}")
+     print("Acesse: http://127.0.0.1:5000\n")
+-    app.run(debug=True, port=5000)
+-
++    app.run(debug=True, port=5001)
++
+

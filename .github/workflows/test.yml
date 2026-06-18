@@ -1,0 +1,49 @@
+name: Testes do Internet Banking
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do codigo
+        uses: actions/checkout@v4
+
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Instalar Schemathesis
+        run: pip install schemathesis
+
+      - name: Iniciar servidor Flask em background
+        run: python app.py &
+
+      - name: Aguardar inicializacao do Flask (3 segundos)
+        run: sleep 3
+
+      - name: Executar pytest com relatorio JUnit XML
+        run: pytest -v --junit-xml=report.xml
+
+      - name: Executar Schemathesis (contract testing)
+        run: |
+          schemathesis run openapi.yaml \
+            --url http://127.0.0.1:5000 \
+            --checks all
+
+      - name: Gerar matriz de rastreabilidade
+        run: python scripts/gera_matriz.py > matriz_rastreabilidade.md
+
+      - name: Exibir matriz no log
+        run: cat matriz_rastreabilidade.md
+
+      - name: Publicar artefatos de evidencia
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidencia
+          path: 'report.xml matriz_rastreabilidade.md'

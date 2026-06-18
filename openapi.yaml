@@ -1,0 +1,175 @@
+openapi: "3.1.0"
+
+info:
+  title: Internet Banking API
+  description: API laboratorial de internet banking — IFRO Teste de Software
+  version: "1.0.0"
+
+servers:
+  - url: http://127.0.0.1:5000
+    description: Servidor local de desenvolvimento
+
+paths:
+
+  /saldo/{conta_id}:
+    get:
+      summary: Consultar saldo de uma conta
+      operationId: getSaldo
+      parameters:
+        - name: conta_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Identificador numérico da conta bancária
+      responses:
+        "200":
+          description: Saldo retornado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [conta_id, titular, saldo]
+                properties:
+                  conta_id:
+                    type: integer
+                  titular:
+                    type: string
+                  saldo:
+                    type: number
+                    format: double
+        "404":
+          description: Conta não encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [erro]
+                properties:
+                  erro:
+                    type: string
+
+  /transferencia:
+    post:
+      summary: Realizar transferência entre contas
+      operationId: postTransferencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [origem, destino, valor]
+              properties:
+                origem:
+                  type: integer
+                  minimum: 1
+                destino:
+                  type: integer
+                  minimum: 1
+                valor:
+                  type: number
+                  format: double
+                  exclusiveMinimum: 0
+      responses:
+        "200":
+          description: Transferência realizada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [mensagem, valor]
+                properties:
+                  mensagem:
+                    type: string
+                  valor:
+                    type: number
+                    format: double
+        "400":
+          description: Requisição inválida
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [erro]
+                properties:
+                  erro:
+                    type: string
+        "404":
+          description: Conta não encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [erro]
+                properties:
+                  erro:
+                    type: string
+        "422":
+          description: Entidade não processável
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [erro]
+                properties:
+                  erro:
+                    type: string
+                  saldo_atual:
+                    type: number
+                    format: double
+
+  /extrato/{conta_id}:
+    get:
+      summary: Consultar extrato de uma conta
+      operationId: getExtrato
+      parameters:
+        - name: conta_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Identificador numérico da conta
+      responses:
+        "200":
+          description: Extrato retornado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [conta_id, titular, saldo_atual, historico]
+                properties:
+                  conta_id:
+                    type: integer
+                  titular:
+                    type: string
+                  saldo_atual:
+                    type: number
+                    format: double
+                  historico:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        origem:
+                          type: integer
+                        destino:
+                          type: integer
+                        valor:
+                          type: number
+                        data_hora:
+                          type: string
+        "404":
+          description: Conta não encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [erro]
+                properties:
+                  erro:
+                    type: string
