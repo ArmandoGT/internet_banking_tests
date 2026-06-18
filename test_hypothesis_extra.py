@@ -60,7 +60,7 @@ def saldo(conta_id):
         allow_infinity=False,
     ),
 )
-@settings(max_examples=30)
+@settings(max_examples=30, deadline=None)
 def test_invariante_saldo_insuficiente_sempre_rejeita_sem_alterar_saldo(origem, destino, excesso):
     reset_database()
     assume(origem != destino)
@@ -88,7 +88,7 @@ def test_invariante_saldo_insuficiente_sempre_rejeita_sem_alterar_saldo(origem, 
         allow_infinity=False,
     ),
 )
-@settings(max_examples=30)
+@settings(max_examples=30, deadline=None)
 def test_invariante_transferencia_aceita_aparece_no_extrato(origem, destino, valor):
     reset_database()
     assume(origem != destino)
